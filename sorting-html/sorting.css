@@ -1,0 +1,18 @@
+.sixButtons {
+    display: flex;
+    flex-direction: row;
+}
+
+.b:active {
+    border: 3px red solid;
+}
+
+.b {
+    border: none;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
