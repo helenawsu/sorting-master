@@ -1,4 +1,4 @@
-import { jspsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 
 var sorting_plugin = (function (jspsych) {
     "use strict";
@@ -8,12 +8,12 @@ var sorting_plugin = (function (jspsych) {
       parameters: {
         // a list of images in their initial display order
         initialOrder: {
-          type: jspsych.ParameterType.IMAGE,
+          type: jspsych.ParameterType.LIST,
           default: undefined,
         },
         // a list of images their true order
         trueOrder: {
-          type: jspsych.ParameterType.IMAGE,
+          type: jspsych.ParameterType.LIST,
           default: undefined,
         },
         scoreFunction: {
@@ -146,12 +146,10 @@ function finish() {
 }
 
         // end trial
-        this.jsPsych.finishTrial(score(timesSwitched));
+        this.jsPsych.finishTrial(score(times));
       }
     }
     sorting_plugin.info = info;
   
     return sorting_plugin;
-  })();
-
-  export default SortingPlugin;
+  })(jsPsychModule);

@@ -20,7 +20,7 @@ let N = initialOrder.length;
 let timesSwitched = 0;
 let switchAttempted = false;
 let buttons = document.getElementsByClassName("b");
-
+window.onload = init();
 function init() {
     for (let i = 0; i < buttons.length; i++) {
             let id = "b" + i.toString();

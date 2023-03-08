@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <title>My first jsPsych experiment</title>
+    <!-- import jsPsych -->
+    <script src="https://unpkg.com/jspsych@7.0.0"></script>
+
+    <!-- import  the jsPsych styling file -->
+    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+
+    <!-- import the image keyboard response plugin -->
+    <script src="plugin-sorting.js"></script>
+  </head>
+  
+  <body>
+
+    <!-- jsPsych code goes here -->
+    <script type="text/javascript">
+
+      // initialize jsPsych
+      var jsPsych = initJsPsych();
+
+      // setup a timeline object 
+      var timeline = [];
+
+      // create a an instruction trial using the jsPsychInstructions plugin
+      var sortingTrial = {
+        type: jsPsychSortingTask,
+        image_ranks: [1,0,2,3,4,5],
+      }
+      timeline.push(sortingTrial)
+
+      // run the experiment
+      jsPsych.run(timeline);
+
+    </script>
+  </body>
+
+</html>
