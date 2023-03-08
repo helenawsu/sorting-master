@@ -154,9 +154,9 @@ var jsPsychSortingTask = (function (jspsych) {
           const node = document.createTextNode("You finish with a score of "+ trial.score_function(timesSwitched).toString() + "!");
           let curOrder = [];
           for (let i = 0; i < N; i++){
-              curOrder.push(trueOrder.indexOf(getImg(document.getElementsByClassName("b")[i])));
+              curOrder.push(((document.getElementsByClassName("b")[i]).style.order));
           }
-          const node1 = document.createTextNode(curOrder.toString());
+          const node1 = document.createTextNode(trial.image_ranks.slice().sort((a, b) => curOrder[trial.image_ranks.indexOf(a)] - curOrder[trial.image_ranks.indexOf(b)]));
           revealOrder.appendChild(node1);
           para.appendChild(node);
           let div = document.getElementById("finish");
