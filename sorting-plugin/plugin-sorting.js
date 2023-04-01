@@ -33,7 +33,6 @@ var jsPsychSortingTask = (function (jspsych) {
       this.jsPsych = jsPsych;
     }
     trial(display_element, trial) {
-
       // display the target word
       // and two buttons
       var html_content = `
@@ -49,20 +48,20 @@ var jsPsychSortingTask = (function (jspsych) {
 
           <br>
 
-          <div class="center">
-              <button id="f">Finish</button>
+          <div style="font-family: 'Open Sans'; font-size: 1.5rem" class="center">
+              <button style="font-family: 'Open Sans'; font-size: 1.5rem" id="f">Finish</button>
           </div>
 
           <div class="center" id="finish"></div>
       `
       display_element.innerHTML = html_content;
 
-      let img1 = `<img src='${trial.initial_ordering[0]}'/ height='150'>`;
-      let img2 = `<img src='${trial.initial_ordering[1]}'/ height='150'>`;
-      let img3 = `<img src='${trial.initial_ordering[2]}'/ height='150'>`;
-      let img4 = `<img src='${trial.initial_ordering[3]}'/ height='150'>`;
-      let img5 = `<img src='${trial.initial_ordering[4]}'/ height='150'>`;
-      let img6 = `<img src='${trial.initial_ordering[5]}'/ height='150'>`;
+      let img1 = `<img src='${trial.initial_ordering[0]}'/ width='150' height='150'>`;
+      let img2 = `<img src='${trial.initial_ordering[1]}'/ width='150' height='150'>`;
+      let img3 = `<img src='${trial.initial_ordering[2]}'/ width='150' height='150'>`;
+      let img4 = `<img src='${trial.initial_ordering[3]}'/ width='150' height='150'>`;
+      let img5 = `<img src='${trial.initial_ordering[4]}'/ width='150' height='150'>`;
+      let img6 = `<img src='${trial.initial_ordering[5]}'/ width='150' height='150'>`;
 
       // initial display; a button always contains the same image, determined by initial order
       let initialOrder = [img1,img2,img3,img4,img5,img6];
@@ -74,6 +73,8 @@ var jsPsychSortingTask = (function (jspsych) {
       let N = initialOrder.length;
       let timesSwitched = 0;
       let buttons = document.getElementsByClassName("b");
+      let originalBorder = "solid 5px black";
+      let highlightBorder = "solid 5px orange"
 
       function init() {
           //put the buttons containing images into a HTMLcollection so I can easily access them 
@@ -81,6 +82,11 @@ var jsPsychSortingTask = (function (jspsych) {
                   let id = "b" + i.toString();
                   let curB = document.getElementById(id);
                   curB.style.order = i;
+                  curB.style.margin = "15px";
+                  curB.style.padding = "10px";
+                  curB.style.border = originalBorder;
+                  curB.style.borderRadius = "30px";
+
                   curB.innerHTML = initialOrder[i];
                   //set each button's onclick to select function
                   curB.onclick = function () {
@@ -98,11 +104,11 @@ var jsPsychSortingTask = (function (jspsych) {
         sixButtonClass.style.display = "flex";
       }
 
-      //reorder and highlight selected images by adding a thich solid black border
+      //reorder and highlight selected images by changing to a orange border
       function select(id) {
           let b = document.getElementById(id);
           buttonsSelected.push(b);
-          b.style.border = "thick solid black";
+          b.style.border = highlightBorder;
           if (buttonsSelected.length == 2) {
               reOrder();
           }
@@ -113,8 +119,8 @@ var jsPsychSortingTask = (function (jspsych) {
           let bb = buttonsSelected[1];
           buttonsSelected = [];
           setTimeout(function() {
-              ba.style.border = "none";
-              bb.style.border = "none";
+              ba.style.border = originalBorder;
+              bb.style.border = originalBorder;
           }, 100);
           if (ba.id == bb.id) {
               return
@@ -139,37 +145,48 @@ var jsPsychSortingTask = (function (jspsych) {
           return !(bigger.style.order > smaller.style.order) ;
         }
 
+      //convenient helpers :D
       function getButton(img) {
           return buttons[initialOrder.indexOf(img)];
       }
-      //helper
       function getImg(button) {
           return initialOrder[button.id.slice(-1)];
       }
-      //show finish message and reveal correct image ranks
+      //used to check whether two arrays contain same elements
+      const equalsCheck = (a, b) => {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+      //show finish message, reveal correct image ranks, and store data
       function finish() {
+        let curOrder = [];
+          for (let i = 0; i < N; i++){
+              curOrder.push( parseInt(((document.getElementsByClassName("b")[i]).style.order)));
+          }
           const para = document.createElement("p");
           const lb = document.createElement("br");
           const revealOrder = document.createElement("p");
-          const node = document.createTextNode("You finish with a score of "+ trial.score_function(timesSwitched).toString() + "!");
-          let curOrder = [];
-          for (let i = 0; i < N; i++){
-              curOrder.push(((document.getElementsByClassName("b")[i]).style.order));
-          }
+          const node = document.createTextNode(equalsCheck(curOrder, trial.image_ranks)? "correct, " : "incorrect, "+ timesSwitched + " comparisons");
           const node1 = document.createTextNode(trial.image_ranks.slice().sort((a, b) => curOrder[trial.image_ranks.indexOf(a)] - curOrder[trial.image_ranks.indexOf(b)]));
           revealOrder.appendChild(node1);
           para.appendChild(node);
           let div = document.getElementById("finish");
           div.appendChild(revealOrder);
-          div.appendChild(lb);
           div.appendChild(para);
+          document.getElementById("f").style.text
           document.getElementById("f").onclick = null;
-          this.jsPsych.finishTrial({choice: "button_b2"})
+          //data storing
+          let data = {
+            score: trial.score_function(timesSwitched),//int or double, you can customize the score function
+            switch_attempted: timesSwitched, //int, defined as number of times users attempt to switch two images / two different images are selected
+            order_all_correct: equalsCheck(curOrder, trial.image_ranks)}; //boolean, whether user order images correctly
+          jsPsych.finishTrial(data)
+          console.log(jsPsych.data.get());
       }
-      init()
+      init();
+      
     }
   }
   jsPsychSortingTask.info = info;
-
+  
   return jsPsychSortingTask;
 })(jsPsychModule);
